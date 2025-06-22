@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Perishable Goods Price Predictor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #f8ffae, #43c6ac);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 6px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        input[type="submit"] {
+            background-color: #43c6ac;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #36a898;
+        }
+
+        h2 {
+            text-align: center;
+            color: #222;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            label, input, select, input[type="submit"] {
+                font-size: 15px;
+            }
+
+            input[type="submit"] {
+                padding: 10px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Perishable Goods Price Prediction</h1>
+        <form method="POST" action="/predict">
+            <label>Original Price:</label>
+            <input type="number" name="original_price" required>
+
+            <label>Inventory Level:</label>
+            <input type="number" name="inventory_level" required>
+
+            <label>Days to Expiry:</label>
+            <input type="number" name="days_to_expiry" required>
+
+            <label>Historical Demand:</label>
+            <input type="number" step="0.01" name="historical_demand" required>
+
+            <label>Product Type:</label>
+            <select name="product_type">
+                <option value="Bakery">Bakery</option>
+                <option value="Fruits">Fruits</option>
+                <option value="Vegetables">Vegetables</option>
+            </select>
+
+            <label>Day of Week:</label>
+            <select name="day_of_week">
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+            </select>
+
+            <label>Season:</label>
+            <select name="season">
+                <option value="Summer">Summer</option>
+                <option value="Winter">Winter</option>
+                <option value="Spring">Spring</option>
+                <option value="Autumn">Autumn</option>
+            </select>
+
+            <input type="submit" value="Predict">
+        </form>
+
+        <h2>{{ prediction_text }}</h2>
+    </div>
+</body>
+</html>

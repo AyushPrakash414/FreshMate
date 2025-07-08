@@ -4,142 +4,614 @@
     <meta charset="UTF-8">
     <title>Perishable Goods Price Predictor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary-color: #10b981;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --secondary-color: #34d399;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
             margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #f8ffae, #43c6ac);
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color)20, var(--secondary-color)20);
+            z-index: -1;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 12px 20px;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            gap: 10px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .theme-toggle i {
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+
+        .theme-toggle .theme-text {
+            display: none;
         }
 
         .container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px;
-            box-sizing: border-box;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        h1 {
+        .card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 40px 30px;
             text-align: center;
-            color: #333;
-            margin-bottom: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
         }
 
-        label {
-            display: block;
-            margin: 12px 0 6px;
-            font-weight: 600;
-            color: #555;
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
         }
 
-        input[type="number"],
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .card-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-header p {
             font-size: 16px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
         }
 
-        input[type="submit"] {
-            background-color: #43c6ac;
+        .card-body {
+            padding: 40px 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 16px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            appearance: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-color)20;
+            transform: translateY(-1px);
+        }
+
+        .form-group select {
+            cursor: pointer;
+            background-color: var(--bg-secondary);
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-position: right 16px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 48px;
+        }
+
+        [data-theme="dark"] .form-group select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             border: none;
-            padding: 12px 18px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
             width: 100%;
-            margin-top: 20px;
-            transition: background-color 0.3s;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: all 0.5s ease;
         }
 
-        input[type="submit"]:hover {
-            background-color: #36a898;
+        .submit-btn:hover::before {
+            left: 100%;
         }
 
-        h2 {
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border-left: 4px solid var(--secondary-color);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result h3 {
+            color: var(--text-primary);
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .result .price {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-top: 10px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .loading {
+            display: none;
             text-align: center;
-            color: #222;
-            margin-top: 25px;
+            padding: 20px;
         }
 
-        @media (max-width: 600px) {
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
             .container {
-                padding: 20px;
-                margin: 10px;
-                border-radius: 10px;
+                padding: 10px;
             }
 
-            h1 {
-                font-size: 22px;
+            .card-header {
+                padding: 30px 20px;
             }
 
-            label, input, select, input[type="submit"] {
+            .card-header h1 {
+                font-size: 24px;
+            }
+
+            .card-body {
+                padding: 30px 20px;
+            }
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 10px 16px;
+            }
+
+            .theme-toggle .theme-text {
+                display: inline;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-header h1 {
+                font-size: 20px;
+            }
+
+            .card-header p {
+                font-size: 14px;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 14px 16px;
                 font-size: 15px;
             }
 
-            input[type="submit"] {
-                padding: 10px 14px;
+            .submit-btn {
+                padding: 16px;
+                font-size: 16px;
+            }
+
+            .result .price {
+                font-size: 28px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Perishable Goods Price Prediction</h1>
-        <form method="POST" action="/predict">
-            <label>Original Price:</label>
-            <input type="number" name="original_price" required>
-
-            <label>Inventory Level:</label>
-            <input type="number" name="inventory_level" required>
-
-            <label>Days to Expiry:</label>
-            <input type="number" name="days_to_expiry" required>
-
-            <label>Historical Demand:</label>
-            <input type="number" step="0.01" name="historical_demand" required>
-
-            <label>Product Type:</label>
-            <select name="product_type">
-                <option value="Bakery">Bakery</option>
-                <option value="Fruits">Fruits</option>
-                <option value="Vegetables">Vegetables</option>
-            </select>
-
-            <label>Day of Week:</label>
-            <select name="day_of_week">
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Wednesday">Wednesday</option>
-                <option value="Thursday">Thursday</option>
-                <option value="Friday">Friday</option>
-                <option value="Saturday">Saturday</option>
-                <option value="Sunday">Sunday</option>
-            </select>
-
-            <label>Season:</label>
-            <select name="season">
-                <option value="Summer">Summer</option>
-                <option value="Winter">Winter</option>
-                <option value="Spring">Spring</option>
-                <option value="Autumn">Autumn</option>
-            </select>
-
-            <input type="submit" value="Predict">
-        </form>
-
-        <h2>{{ prediction_text }}</h2>
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon" id="theme-icon"></i>
+        <span class="theme-text" id="theme-text">Dark</span>
     </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1><i class="fas fa-chart-line"></i> Smart Price Predictor</h1>
+                <p>AI-powered perishable goods pricing</p>
+            </div>
+            
+            <div class="card-body">
+                <form id="predictionForm" method="POST" action="/predict">
+                    <div class="form-grid">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label><i class="fas fa-tag"></i> Original Price</label>
+                                <input type="number" name="original_price" id="original_price" step="0.01" required placeholder="Enter original price">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-boxes"></i> Inventory Level</label>
+                                <input type="number" name="inventory_level" id="inventory_level" required placeholder="Enter inventory level">
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-times"></i> Days to Expiry</label>
+                                <input type="number" name="days_to_expiry" id="days_to_expiry" required placeholder="Enter days to expiry">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-chart-area"></i> Historical Demand</label>
+                                <input type="number" name="historical_demand" id="historical_demand" step="0.01" required placeholder="Enter historical demand">
+                            </div>
+                        </div>
+
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label><i class="fas fa-apple-alt"></i> Product Type</label>
+                                <select name="product_type" id="product_type" required>
+                                    <option value="">Select Product Type</option>
+                                    <option value="Bakery">Dairy</option>
+                                    <option value="Fruits">Fruits</option>
+                                    <option value="Vegetables">Vegetables</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-day"></i> Day of Week</label>
+                                <select name="day_of_week" id="day_of_week" required>
+                                    <option value="">Select Day</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                    <option value="Sunday">Sunday</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-leaf"></i> Season</label>
+                                <select name="season" id="season" required>
+                                    <option value="">Select Season</option>
+                                    <option value="Summer">Summer</option>
+                                    <option value="Winter">Winter</option>
+                                    <option value="Spring">Spring</option>
+                                    <option value="Autumn">Autumn</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-magic"></i> Predict Price
+                    </button>
+                </form>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing market data...</p>
+                </div>
+
+                <div class="result" id="result" style="display: none;">
+                    <h3><i class="fas fa-money-bill-wave"></i> Prediction Result</h3>
+                    <div class="price" id="predicted-price"></div>
+                </div>
+                <h2 id="prediction-text" style="display:none;">{{ prediction_text }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            const currentTheme = html.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                html.removeAttribute('data-theme');
+                themeIcon.className = 'fas fa-moon';
+                themeText.textContent = 'Dark';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = 'Light';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Load saved theme
+        window.addEventListener('load', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = 'Light';
+            }
+
+            // Set current day as default
+            const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+            document.getElementById('day_of_week').value = today;
+
+            // Set current season as default
+            const month = new Date().getMonth();
+            let season = 'Spring';
+            if (month >= 5 && month <= 7) season = 'Summer';
+            else if (month >= 8 && month <= 10) season = 'Autumn';
+            else if (month >= 11 || month <= 2) season = 'Winter';
+            document.getElementById('season').value = season;
+        });
+
+        // Enhanced form submission with loading state
+        document.getElementById('predictionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const loadingDiv = document.getElementById('loading');
+            const resultDiv = document.getElementById('result');
+            const submitBtn = document.querySelector('.submit-btn');
+            
+            // Show loading state
+            loadingDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Predicting...';
+            
+            // Simulate API call (replace with actual form submission)
+            setTimeout(() => {
+                // Get form data
+                const formData = new FormData(this);
+                
+                // Store form values
+                const formValues = {};
+                for (let [key, value] of formData.entries()) {
+                    formValues[key] = value;
+                }
+                
+                // Submit form
+                fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // Parse the response to extract prediction
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const predictionElement = doc.querySelector('h2');
+                    
+                    if (predictionElement && predictionElement.textContent.includes('Predicted Final Price')) {
+                        const price = predictionElement.textContent.match(/₹([\d.]+)/)[1];
+                        document.getElementById('predicted-price').textContent = `₹${price}`;
+                        
+                        // Show result
+                        loadingDiv.style.display = 'none';
+                        resultDiv.style.display = 'block';
+                        
+                        // Restore form values
+                        for (let [key, value] of Object.entries(formValues)) {
+                            const element = document.getElementById(key);
+                            if (element) element.value = value;
+                        }
+                    } else if (predictionElement && predictionElement.textContent.startsWith('Error:')) {
+                        // Show backend error message
+                        document.getElementById('predicted-price').textContent = predictionElement.textContent;
+                        loadingDiv.style.display = 'none';
+                        resultDiv.style.display = 'block';
+                    } else {
+                        // Handle error
+                        document.getElementById('predicted-price').textContent = 'Error in prediction';
+                        loadingDiv.style.display = 'none';
+                        resultDiv.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('predicted-price').textContent = 'Error occurred';
+                    loadingDiv.style.display = 'none';
+                    resultDiv.style.display = 'block';
+                })
+                .finally(() => {
+                    // Reset button
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-magic"></i> Predict Price';
+                });
+            }, 1000);
+        });
+
+        // Input validation and formatting
+        document.addEventListener('DOMContentLoaded', function() {
+            const numberInputs = document.querySelectorAll('input[type="number"]');
+            
+            numberInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.value < 0) this.value = 0;
+                });
+            });
+        });
+    </script>
 </body>
 </html>

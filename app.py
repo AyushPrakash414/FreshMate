@@ -15,6 +15,11 @@ with open("model_columns.json") as f:
 def home():
     return render_template('index.html')
 
+@app.route('/health')
+def health():
+    return "OK", 200
+
+
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
